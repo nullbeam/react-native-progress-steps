@@ -1,46 +1,48 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 import { View } from 'react-native';
 import { times } from 'lodash';
 import PropTypes from 'prop-types';
 import StepIcon from './StepIcon';
+import ProgressContext from './ProgressContext';
 
-class ProgressSteps extends Component {
-  state = {
-    stepCount: 0,
-    activeStep: this.props.activeStep,
-  };
+const ProgressSteps = (props) => {
+  const [stepCount, setStepCount] = React.useState(0);
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [labels, setLabels] = React.useState([]);
 
-  componentDidMount() {
-    this.setState({ stepCount: React.Children.count(this.props.children) });
-  }
+  useEffect(() => {
+    const childLabels = [];
+    React.Children.forEach(props.children, (child) => {
+      childLabels.push(child.props.label);
+    })
+    setLabels(childLabels);
+    setStepCount(props.stepCount);
+  }, [props.children])
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.activeStep !== this.props.activeStep) {
-      this.setActiveStep(this.props.activeStep);
-    }
-  }
+  useEffect(() => {
+    setActiveStep(props.activeStep);
+  }, [props.activeStep])
 
-  getChildProps() {
-    return { ...this.props, ...this.state };
+  const getChildProps = () => {
+    return { ...props, stepCount, activeStep };
   }
 
   renderStepIcons = () => {
     let step = [];
 
-    times(this.state.stepCount, (i) => {
-      const isCompletedStep = this.props.isComplete ? true : i < this.state.activeStep;
-
-      const isActiveStep = this.props.isComplete ? false : i === this.state.activeStep;
+    times(stepCount, (i) => {
+      const isCompletedStep = props.isComplete ? true : i < activeStep;
+      const isActiveStep = props.isComplete ? false : i === activeStep;
 
       step.push(
         <View key={i}>
           <View>
             <StepIcon
-              {...this.getChildProps()}
+              {...getChildProps()}
               stepNum={i + 1}
-              label={this.props.children[i].props.label}
+              label={labels[i]}
               isFirstStep={i === 0}
-              isLastStep={i === this.state.stepCount - 1}
+              isLastStep={i === stepCount - 1}
               isCompletedStep={isCompletedStep}
               isActiveStep={isActiveStep}
             />
@@ -53,42 +55,43 @@ class ProgressSteps extends Component {
   };
 
   // Callback function from ProgressStep that passes current step.
-  setActiveStep = (step) => {
+  const onChangeActiveStep = (step) => {
     // Guard against setting current step higher than total step count.
-    if (step >= this.state.stepCount - 1) {
-      this.setState({ activeStep: this.state.stepCount - 1 });
+    if (step >= stepCount - 1) {
+      setActiveStep(stepCount - 1);
     }
 
-    if (step > -1 && step < this.state.stepCount - 1) {
-      this.setState({ activeStep: step });
+    if (step > -1 && step < stepCount - 1) {
+      setActiveStep(step);
     }
   };
 
-  render() {
-    const styles = {
-      stepIcons: {
-        position: 'relative',
-        justifyContent: 'space-evenly',
-        alignSelf: 'center',
-        flexDirection: 'row',
-        top: this.props.topOffset,
-        marginBottom: this.props.marginBottom,
-      },
-    };
+  const styles = {
+    stepIcons: {
+      position: 'relative',
+      justifyContent: 'space-evenly',
+      alignSelf: 'center',
+      flexDirection: 'row',
+      top: props.topOffset,
+      marginBottom: props.marginBottom,
+    },
+  };
 
-    return (
+  return (
+    <ProgressContext.Provider value={{setActiveStep: onChangeActiveStep, activeStep: activeStep, stepCount: stepCount}}>
       <View style={{ flex: 1 }}>
-        <View style={styles.stepIcons}>{this.renderStepIcons()}</View>
+        <View style={styles.stepIcons}>{renderStepIcons()}</View> 
         <View style={{ flex: 1 }}>
-          {React.cloneElement(this.props.children[this.state.activeStep], {
+          {/* {React.cloneElement(this.props.children[this.state.activeStep], {
             setActiveStep: this.setActiveStep,
             activeStep: this.state.activeStep,
             stepCount: this.state.stepCount,
-          })}
+          })} */}
+          {props.children}
         </View>
       </View>
-    );
-  }
+    </ProgressContext.Provider>
+  );
 }
 
 ProgressSteps.propTypes = {

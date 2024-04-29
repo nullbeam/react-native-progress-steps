@@ -1,6 +1,6 @@
 {
   "name": "react-native-progress-steps",
-  "version": "1.3.4",
+  "version": "1.0.0",
   "description": "A simple and fully customizable React Native component that implements a progress stepper UI.",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/colbymillerdev/react-native-progress-steps.git"
+    "url": "git+https://github.com/nullbeam/react-native-progress-steps.git"
   },
   "keywords": [
     "react-native",
@@ -24,12 +24,12 @@
     "progress",
     "progress steps"
   ],
-  "author": "Colby Miller",
+  "author": "Jerson Miranda",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/colbymillerdev/react-native-progress-steps/issues"
+    "url": "https://github.com/nullbeam/react-native-progress-steps/issues"
   },
-  "homepage": "https://github.com/colbymillerdev/react-native-progress-steps#readme",
+  "homepage": "https://github.com/nullbeam/react-native-progress-steps#readme",
   "devDependencies": {
     "metro-react-native-babel-preset": "^0.51.1"
   },
